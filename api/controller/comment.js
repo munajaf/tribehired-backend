@@ -5,7 +5,17 @@ exports.filterComment = async ({ query: filters }, res) => {
 
     const filteredComments = comments.filter(comment =>
         Object.keys(filters).reduce(
-            (acc,param) => (comment[param] === +filters[param]) && acc, true
+            (acc,param) => {
+                const apiValue = comment[param];
+                const requestValue = filters[param];
+
+                const isString = typeof apiValue === 'string';
+
+                const intHandler = apiValue === +requestValue;
+                const stringHandler = isString && apiValue.includes(requestValue)
+
+                return ( intHandler || stringHandler) && acc;
+            }, true
         )
     )
 
